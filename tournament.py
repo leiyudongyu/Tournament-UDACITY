@@ -13,14 +13,30 @@ def connect():
 
 def deleteMatches():
     """Remove all the match records from the database."""
+    conn = connect()
+    curs = conn.cursor()
+    curs.execute("delete from matches;")
+    conn.commit()
+    conn.close()
 
 
 def deletePlayers():
     """Remove all the player records from the database."""
+    conn = connect()
+    curs = conn.cursor()
+    curs.execute("delete from players;")
+    conn.commit()
+    conn.close()
 
 
 def countPlayers():
     """Returns the number of players currently registered."""
+    conn = connect()
+    curs = conn.cursor()
+    curs.execute("select count(*) from players;")
+    totalnums = curs.fetchone()
+    conn.close()
+    return totalnums[0]
 
 
 def registerPlayer(name):
@@ -32,6 +48,11 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
+    conn = connect()
+    curs = conn.cursor()
+    curs.execute("insert into players values (%s);", (name,))
+    conn.commit()
+    conn.close()
 
 
 def playerStandings():
@@ -47,6 +68,12 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
+    conn = connect()
+    curs = conn.cursor()
+    curs.execute("select * from standings;")
+    temp = curs.fetchall()
+    conn.close()
+    return temp
 
 
 def reportMatch(winner, loser):
@@ -56,6 +83,11 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
+    conn = connect()
+    curs = conn.cursor()
+    curs.execute("insert into matches (winner_id, loser_id) values (%s, %s);", (winner, loser))
+    conn.commit()
+    conn.close()
  
  
 def swissPairings():
@@ -73,5 +105,10 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
+    temp = playerStandings()
+    list = []
+    for i in range(1, len(temp), 2):
+        list.append((temp[i - 1][0], temp[i - 1][1], temp[i][0], temp[i][1]))
+    return list
 
 
